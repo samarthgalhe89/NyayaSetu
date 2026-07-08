@@ -1,0 +1,28 @@
+[project]
+name = "nyayasetu"
+version = "1.0.0"
+description = "AI-powered Indian legal rights navigator using RAG"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # --- Core RAG (existing) ---
+    "chromadb>=1.5.9",
+    "langchain>=1.3.1",
+    "langchain-community>=0.4.2",
+    "langchain-core>=1.4.0",
+    "langchain-text-splitters>=0.4.0",
+    "pymupdf>=1.27.2.3",
+    "pypdf>=6.12.1",
+    "sentence-transformers>=5.5.1",
+    # --- LLM Provider ---
+    "langchain-groq>=0.3.0",
+    "python-dotenv>=1.1.0",
+    # --- Web Framework ---
+    "fastapi>=0.115.0",
+    "uvicorn>=0.34.0",
+    # --- Configuration & Validation ---
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.9.0",
+    # --- Logging ---
+    "loguru>=0.7.0",
+]

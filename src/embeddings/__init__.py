@@ -1,0 +1,1 @@
+"""Embedding management module."""

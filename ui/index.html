@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyayaSetu — AI Legal Intelligence Platform</title>
+  <meta name="description"
+    content="NyayaSetu is an AI-powered legal rights navigator for Indian citizens. Get instant answers about consumer protection, RTI, property law, criminal law, and more — backed by real legal documents.">
+  <meta name="keywords" content="Indian law, legal rights, RTI, consumer protection, legal AI, NyayaSetu">
+
+  <!-- Fonts: Manrope (display+body) + Geist (labels/code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Geist font (label/mono) via CDN -->
+  <style>
+    @import url('https://fonts.cdnfonts.com/css/geist-sans');
+  </style>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANIMATED BACKGROUND
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="orb orb-5"></div>
+    <canvas id="particle-canvas"></canvas>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       APP SHELL — 3-panel layout
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="app-shell">
+
+    <!-- ─────────────────────────────────────────
+         SIDEBAR
+         ───────────────────────────────────────── -->
+    <aside id="sidebar" aria-label="Navigation sidebar">
+
+      <!-- Sidebar header: logo + collapse -->
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon" aria-hidden="true">
+            <i data-lucide="scale"></i>
+          </div>
+          <div class="logo-text">
+            <span class="logo-name">NyayaSetu</span>
+            <span class="logo-tag">Legal Intelligence</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Chat -->
+      <div class="sidebar-section">
+        <button id="new-chat-btn" class="new-chat-btn" aria-label="Start new chat">
+          <i data-lucide="plus"></i>
+          <span>New Chat</span>
+        </button>
+      </div>
+
+      <!-- Search Chats -->
+      <div class="sidebar-section">
+        <div class="sidebar-search">
+          <i data-lucide="search"></i>
+          <input type="text" id="chat-search-input" placeholder="Search chats..." aria-label="Search chat history">
+        </div>
+      </div>
+
+      <!-- Pinned Chats -->
+      <div class="sidebar-section" id="pinned-section">
+        <div class="sidebar-section-label">
+          <i data-lucide="pin"></i>
+          <span>Pinned</span>
+        </div>
+        <div id="pinned-chats" class="chat-history-list">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+
+      <!-- Chat History -->
+      <div class="sidebar-section sidebar-history-section">
+        <div class="sidebar-section-label">
+          <i data-lucide="clock"></i>
+          <span>Recent</span>
+        </div>
+        <div id="chat-history" class="chat-history-list">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+
+
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <button class="sidebar-footer-btn" id="bookmarks-btn" aria-label="Bookmarks">
+          <i data-lucide="bookmark"></i>
+          <span>Bookmarks</span>
+        </button>
+        <button class="sidebar-footer-btn" id="settings-btn" aria-label="Settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </button>
+        <button class="sidebar-footer-btn" id="about-btn" aria-label="About NyayaSetu">
+          <i data-lucide="info"></i>
+          <span>About</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ─────────────────────────────────────────
+         MAIN PANEL
+         ───────────────────────────────────────── -->
+    <main id="main-panel" aria-label="Main content">
+
+      <!-- Top bar (mobile/collapsed sidebar toggle) -->
+      <div id="topbar">
+        <button id="sidebar-open-btn" class="icon-btn" aria-label="Open sidebar" title="Open sidebar">
+          <i data-lucide="panel-left-open"></i>
+        </button>
+        <div class="topbar-brand">
+          <i data-lucide="scale"></i>
+          <span>NyayaSetu</span>
+        </div>
+      </div>
+
+      <!-- ── LANDING HERO (shown before first message) ── -->
+      <section id="landing-hero" aria-label="Landing screen">
+        <div class="hero-content">
+          <div class="hero-logo-wrap">
+            <div class="hero-logo-icon">
+              <i data-lucide="scale"></i>
+            </div>
+            <div class="hero-logo-glow" aria-hidden="true"></div>
+          </div>
+          <h1 class="hero-title">NyayaSetu</h1>
+          <p class="hero-subtitle">Your AI Legal Rights Navigator - Powered by Indian Law</p>
+          <p class="hero-description">Ask any legal question and get structured answers backed by real legal documents, sections, and case precedents.</p>
+
+
+          <!-- Suggested prompts -->
+          <div class="suggestions-label">Try asking about...</div>
+          <div class="suggestions-list" id="suggestions" aria-label="Suggested legal questions">
+            <button class="suggestion-item" data-question="Can my landlord refuse to return my security deposit?">Can my landlord refuse to return my security deposit?</button>
+            <button class="suggestion-item" data-question="How do I file an RTI application?">How do I file an RTI application?</button>
+            <button class="suggestion-item" data-question="Can I get a refund for a defective product?">Can I get a refund for a defective product?</button>
+            <button class="suggestion-item" data-question="What are my rights after wrongful termination?">What are my rights after wrongful termination?</button>
+            <button class="suggestion-item" data-question="How do I report cyber fraud?">How do I report cyber fraud?</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── CHAT AREA (shown after first message) ── -->
+      <section id="chat-area" class="hidden" aria-label="Chat conversation" aria-live="polite">
+        <div id="chat-container">
+          <!-- Messages injected by app.js -->
+        </div>
+
+        <!-- RAG Pipeline Animation (replaces typing indicator) -->
+        <div id="rag-pipeline" class="hidden" aria-label="Processing your question" aria-live="polite">
+          <div class="rag-pipeline-inner">
+            <div class="rag-icon-ring">
+              <i data-lucide="cpu"></i>
+            </div>
+            <div class="rag-stages">
+              <div class="rag-stage" id="rag-stage-1">
+                <div class="rag-stage-dot"></div>
+                <span>Searching legal database...</span>
+              </div>
+              <div class="rag-stage" id="rag-stage-2">
+                <div class="rag-stage-dot"></div>
+                <span>Finding relevant legal sections...</span>
+              </div>
+              <div class="rag-stage" id="rag-stage-3">
+                <div class="rag-stage-dot"></div>
+                <span>Ranking retrieved documents...</span>
+              </div>
+              <div class="rag-stage" id="rag-stage-4">
+                <div class="rag-stage-dot"></div>
+                <span>Preparing legal context...</span>
+              </div>
+              <div class="rag-stage" id="rag-stage-5">
+                <div class="rag-stage-dot"></div>
+                <span>Generating AI response...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── INPUT DOCK ── -->
+      <div id="input-dock-container">
+        <div id="input-dock">
+          <form id="query-form" autocomplete="off">
+            <div id="input-row">
+              <textarea id="query-input" placeholder="Ask your legal question..." aria-label="Type your legal question"
+                rows="1" maxlength="4000"></textarea>
+              <button type="submit" id="send-btn" aria-label="Send question" title="Send (Enter)">
+                <i data-lucide="send"></i>
+              </button>
+            </div>
+          </form>
+          <div id="input-meta">
+            <span class="disclaimer-mini">
+              <i data-lucide="alert-triangle"></i>
+              AI-generated legal information. Not a substitute for professional legal advice.
+            </span>
+            <span id="char-counter" class="char-counter">0 / 4000</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ─────────────────────────────────────────
+         SOURCES PANEL (right)
+         ───────────────────────────────────────── -->
+    <aside id="sources-panel" aria-label="Legal sources and references">
+      <div class="sources-panel-header">
+        <div class="sources-panel-title">
+          <i data-lucide="book-open"></i>
+          <span>Legal Sources</span>
+        </div>
+        <button id="sources-close-btn" class="icon-btn" aria-label="Close sources panel">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Confidence Meter -->
+      <div id="confidence-section" class="hidden">
+        <div class="confidence-card">
+          <div class="confidence-header">
+            <div class="confidence-label">
+              <i data-lucide="bar-chart-2"></i>
+              Answer Confidence
+            </div>
+            <div class="confidence-value" id="confidence-value">—</div>
+          </div>
+          <div class="confidence-bar-wrap">
+            <div class="confidence-bar">
+              <div class="confidence-bar-fill" id="confidence-bar-fill"></div>
+            </div>
+          </div>
+          <div class="confidence-note">Based on retrieved legal documents</div>
+        </div>
+      </div>
+
+      <!-- Category badge -->
+      <div id="category-badge-wrap" class="hidden">
+        <div class="category-badge" id="category-badge">
+          <i data-lucide="tag"></i>
+          <span id="category-badge-text"></span>
+        </div>
+      </div>
+
+      <!-- Sources list -->
+      <div id="sources-list">
+        <!-- Empty state -->
+        <div class="sources-empty" id="sources-empty">
+          <div class="sources-empty-icon">
+            <i data-lucide="book-open"></i>
+          </div>
+          <p class="sources-empty-title">No sources yet</p>
+          <p class="sources-empty-desc">Ask a legal question to see the retrieved legal provisions and documents here.</p>
+        </div>
+        <!-- Source cards injected by app.js -->
+      </div>
+
+      <!-- Sources panel footer -->
+      <div class="sources-panel-footer" id="sources-footer" style="display:none">
+        <button class="copy-all-btn" id="copy-all-citations-btn" aria-label="Copy all citations">
+          <i data-lucide="copy"></i>
+          Copy All Citations
+        </button>
+      </div>
+    </aside>
+
+     <!-- Floating Sources Toggle -->
+    <button
+      id="sources-toggle-btn"
+      class="floating-sources-btn"
+      aria-label="Open Legal Sources"
+      title="Open Legal Sources">
+      <i data-lucide="book-open"></i>
+    </button>
+
+  </div><!-- /#app-shell -->
+
+  <!-- ─────────────────────────────────────────
+       CONTEXT MENU (chat history item)
+       ───────────────────────────────────────── -->
+  <div id="context-menu" class="hidden" role="menu" aria-label="Chat options">
+    <button class="ctx-item" id="ctx-rename" role="menuitem">
+      <i data-lucide="pencil"></i> Rename
+    </button>
+    <button class="ctx-item" id="ctx-pin" role="menuitem">
+      <i data-lucide="pin"></i> Pin
+    </button>
+    <button class="ctx-item ctx-danger" id="ctx-delete" role="menuitem">
+      <i data-lucide="trash-2"></i> Delete
+    </button>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       RENAME MODAL
+       ───────────────────────────────────────── -->
+  <div id="rename-modal-overlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rename-modal-title">
+      <h3 id="rename-modal-title">Rename Chat</h3>
+      <input type="text" id="rename-input" placeholder="Chat name..." aria-label="New chat name" maxlength="80">
+      <div class="modal-actions">
+        <button id="rename-cancel-btn" class="modal-btn modal-btn-ghost">Cancel</button>
+        <button id="rename-confirm-btn" class="modal-btn modal-btn-accent">Rename</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       SIDEBAR OVERLAY (mobile)
+       ───────────────────────────────────────── -->
+  <div id="sidebar-overlay" class="hidden" aria-hidden="true"></div>
+
+  <!-- App JS -->
+  <script src="/static/js/app.js?v=3"></script>
+  <script>
+    // Initialize Lucide icons after DOM is ready
+    lucide.createIcons();
+  </script>
+
+</body>
+
+</html>
